@@ -9,9 +9,13 @@ interface AppErrorBoundaryState {
 }
 
 function clearSeriesJournalData() {
-  Object.keys(localStorage)
-    .filter((key) => key.startsWith('series-tracker:'))
-    .forEach((key) => localStorage.removeItem(key));
+  try {
+    Object.keys(window.localStorage)
+      .filter((key) => key.startsWith('series-tracker:'))
+      .forEach((key) => window.localStorage.removeItem(key));
+  } catch {
+    // Storage may be blocked in mobile browsers; reloading is still safe.
+  }
 }
 
 export class AppErrorBoundary extends Component<AppErrorBoundaryProps, AppErrorBoundaryState> {
