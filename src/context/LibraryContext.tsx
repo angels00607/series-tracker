@@ -19,19 +19,6 @@ interface LibraryContextValue {
 
 export const LibraryContext = createContext<LibraryContextValue | null>(null);
 
-function mergePublishedData(current: UserData, published: UserData): UserData {
-  const publishedIds = new Set(published.library.map((series) => series.id));
-  const publishedRemovedIds = new Set(published.removedIds ?? []);
-  const removedIds = Array.from(new Set([...(current.removedIds ?? []), ...(published.removedIds ?? [])]));
-  const localOnly = current.library.filter((series) => !publishedIds.has(series.id) && !publishedRemovedIds.has(series.id));
-
-  return {
-    ...published,
-    library: [...published.library, ...localOnly],
-    removedIds,
-  };
-}
-
 function mergeRefreshedSeries(current: LibrarySeries, refreshed: Series): LibrarySeries {
   return {
     ...refreshed,
@@ -76,13 +63,12 @@ export function LibraryProvider({ children }: { children: React.ReactNode }) {
   const [data, setData] = useState<UserData>(() => loadUserData());
   const [readyToPersist, setReadyToPersist] = useState(false);
 
-  // On every boot, pull only the published backup. TVMaze updates stay manual so opening the app
-  // remains light and predictable on mobile.
+  // On every boot, the published backup is the source of truth across devices.
   useEffect(() => {
     let cancelled = false;
     loadPublishedUserData().then((published) => {
       if (cancelled) return;
-      if (published) setData((current) => mergePublishedData(current, published));
+      if (published) setData(published);
       setReadyToPersist(true);
     });
     return () => { cancelled = true; };
