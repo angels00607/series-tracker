@@ -4,6 +4,7 @@ const DATA_KEY = 'series-tracker:user-data';
 const GITHUB_CONFIG_KEY = 'series-tracker:github-config';
 const GITHUB_TOKEN_KEY = 'series-tracker:github-token';
 const PUBLISHED_DATA_FILE = 'series-tracker-data.json';
+const GITHUB_DATA_FILE = `public/${PUBLISHED_DATA_FILE}`;
 
 export const emptyUserData = (): UserData => ({ version: 1, updatedAt: new Date().toISOString(), library: [], removedIds: [] });
 
@@ -143,7 +144,7 @@ export async function readJsonFile(file: File): Promise<UserData> {
 }
 
 export function loadGitHubConfig(): GitHubSyncConfig {
-  const fallback: GitHubSyncConfig = { username: 'angels00607', repository: 'series-tracker', branch: 'main', filePath: PUBLISHED_DATA_FILE, rememberToken: false };
+  const fallback: GitHubSyncConfig = { username: 'angels00607', repository: 'series-tracker', branch: 'main', filePath: GITHUB_DATA_FILE, rememberToken: false };
   const token = localStorage.getItem(GITHUB_TOKEN_KEY) || undefined;
   const raw = localStorage.getItem(GITHUB_CONFIG_KEY);
   if (!raw) return { ...fallback, token, rememberToken: Boolean(token) };
