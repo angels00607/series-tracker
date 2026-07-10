@@ -1,0 +1,91 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background:
+    radial-gradient(circle at top left, rgba(219, 201, 249, 0.55), transparent 26rem),
+    radial-gradient(circle at bottom right, rgba(166, 186, 238, 0.25), transparent 24rem),
+    linear-gradient(160deg, #F8F7FC, #FFFFFF 55%, #F3F0FB);
+  color: #312048;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+button, input, select, textarea { font: inherit; }
+
+img { max-width: 100%; }
+
+.app-header-inner {
+  padding-left: max(1rem, env(safe-area-inset-left));
+  padding-right: max(1rem, env(safe-area-inset-right));
+}
+
+.app-main {
+  padding-left: max(1rem, env(safe-area-inset-left));
+  padding-right: max(1rem, env(safe-area-inset-right));
+}
+
+.app-tabbar {
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: max(0px, env(safe-area-inset-left));
+  padding-right: max(0px, env(safe-area-inset-right));
+}
+
+.app-nav {
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.app-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@media (max-width: 430px) {
+  .mobile-card {
+    border-radius: 1.25rem;
+    padding: 1rem;
+  }
+
+  .mobile-title {
+    font-size: clamp(1.5rem, 7vw, 2rem);
+    line-height: 1.08;
+    overflow-wrap: anywhere;
+  }
+
+  .mobile-button-stack > * {
+    width: 100%;
+  }
+
+  .mobile-button-stack button,
+  .mobile-button-stack label {
+    width: 100%;
+  }
+}
