@@ -3,12 +3,19 @@ import { AppErrorBoundary } from './components/common/AppErrorBoundary';
 import { LibraryProvider } from './context/LibraryContext';
 import { AppRouter } from './router/AppRouter';
 
-const redirect = sessionStorage.getItem('redirect');
-if (redirect) {
-  sessionStorage.removeItem('redirect');
-  const url = new URL(redirect);
-  history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`);
+function restoreRedirect() {
+  try {
+    const redirect = sessionStorage.getItem('redirect');
+    if (!redirect) return;
+    sessionStorage.removeItem('redirect');
+    const url = new URL(redirect);
+    history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`);
+  } catch {
+    // Some mobile browsers can block sessionStorage. The app can still start normally.
+  }
 }
+
+restoreRedirect();
 
 export default function App() {
   return (
