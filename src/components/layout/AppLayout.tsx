@@ -1,4 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom';
+import appIconUrl from '../../../app-icon.jpg';
 import { routes } from '../../constants/routes';
 import { Icon, type IconName } from '../ui/Icon';
 
@@ -16,7 +17,7 @@ export function AppLayout() {
       <header className="sticky top-0 z-20 border-b border-primary/10 bg-background/85 backdrop-blur-xl">
         <div className="app-header-inner mx-auto flex max-w-6xl items-center justify-between gap-3 py-3 sm:px-6">
           <div className="flex min-w-0 items-center gap-2.5">
-            <img src={`${import.meta.env.BASE_URL}app-icon.jpg`} alt="" className="h-9 w-9 shrink-0 rounded-xl object-cover shadow-card" />
+            <img src={appIconUrl} alt="" className="h-9 w-9 shrink-0 rounded-xl object-cover shadow-card" />
             <h1 className="truncate text-base font-black text-text sm:text-lg">Series Journal</h1>
           </div>
           <nav className="hidden items-center gap-1 lg:flex">
