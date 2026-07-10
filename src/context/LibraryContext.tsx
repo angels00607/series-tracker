@@ -19,33 +19,17 @@ interface LibraryContextValue {
 
 export const LibraryContext = createContext<LibraryContextValue | null>(null);
 
-function timestamp(value: string): number {
-  const parsed = Date.parse(value);
-  return Number.isNaN(parsed) ? 0 : parsed;
-}
-
-function sameIds(left: number[], right: number[]): boolean {
-  if (left.length !== right.length) return false;
-  const rightIds = new Set(right);
-  return left.every((id) => rightIds.has(id));
-}
-
 function mergePublishedData(current: UserData, published: UserData): UserData {
-  const publishedIsNewer = timestamp(published.updatedAt) > timestamp(current.updatedAt);
-  const currentRemovedIds = new Set(current.removedIds ?? []);
+  const publishedIds = new Set(published.library.map((series) => series.id));
   const publishedRemovedIds = new Set(published.removedIds ?? []);
   const removedIds = Array.from(new Set([...(current.removedIds ?? []), ...(published.removedIds ?? [])]));
+  const localOnly = current.library.filter((series) => !publishedIds.has(series.id) && !publishedRemovedIds.has(series.id));
 
-  if (publishedIsNewer) {
-    const publishedIds = new Set(published.library.map((series) => series.id));
-    const localOnly = current.library.filter((series) => !publishedIds.has(series.id) && !publishedRemovedIds.has(series.id));
-    return { ...published, library: [...published.library, ...localOnly], removedIds };
-  }
-
-  const knownIds = new Set(current.library.map((series) => series.id));
-  const additions = published.library.filter((series) => !knownIds.has(series.id) && !currentRemovedIds.has(series.id));
-  if (!additions.length && sameIds(removedIds, current.removedIds ?? [])) return current;
-  return { ...current, library: [...current.library, ...additions], removedIds };
+  return {
+    ...published,
+    library: [...published.library, ...localOnly],
+    removedIds,
+  };
 }
 
 function mergeRefreshedSeries(current: LibrarySeries, refreshed: Series): LibrarySeries {
