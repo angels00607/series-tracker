@@ -107,7 +107,8 @@ export async function loadPublishedUserData(): Promise<UserData | null> {
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 8000);
-    const response = await fetch(`${import.meta.env.BASE_URL}${PUBLISHED_DATA_FILE}`, { cache: 'no-store', signal: controller.signal });
+    const url = `${import.meta.env.BASE_URL}${PUBLISHED_DATA_FILE}?v=${Date.now()}`;
+    const response = await fetch(url, { cache: 'no-store', headers: { 'Cache-Control': 'no-cache' }, signal: controller.signal });
     clearTimeout(timeout);
     if (!response.ok) return null;
     const parsed = (await response.json()) as unknown;
