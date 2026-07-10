@@ -8,6 +8,30 @@ const GITHUB_DATA_FILE = `public/${PUBLISHED_DATA_FILE}`;
 
 export const emptyUserData = (): UserData => ({ version: 1, updatedAt: new Date().toISOString(), library: [], removedIds: [] });
 
+function storageGet(key: string): string | null {
+  try {
+    return window.localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function storageSet(key: string, value: string): void {
+  try {
+    window.localStorage.setItem(key, value);
+  } catch {
+    // Mobile browsers can disable or evict localStorage. The app still works from the published backup.
+  }
+}
+
+function storageRemove(key: string): void {
+  try {
+    window.localStorage.removeItem(key);
+  } catch {
+    // Ignore blocked storage on mobile browsers.
+  }
+}
+
 export function validateUserData(value: unknown): value is UserData {
   if (!value || typeof value !== 'object') return false;
   const data = value as UserData;
@@ -85,18 +109,19 @@ function withDefaults(data: UserData): UserData {
 }
 
 export function loadUserData(): UserData {
-  const raw = localStorage.getItem(DATA_KEY);
+  const raw = storageGet(DATA_KEY);
   if (!raw) return emptyUserData();
   try {
     const parsed = JSON.parse(raw) as unknown;
     return validateUserData(parsed) ? withDefaults(parsed) : emptyUserData();
   } catch {
+    storageRemove(DATA_KEY);
     return emptyUserData();
   }
 }
 
 export function hasLocalUserData(): boolean {
-  return localStorage.getItem(DATA_KEY) !== null;
+  return storageGet(DATA_KEY) !== null;
 }
 
 /**
@@ -120,11 +145,11 @@ export async function loadPublishedUserData(): Promise<UserData | null> {
 }
 
 export function saveUserData(data: UserData): void {
-  localStorage.setItem(DATA_KEY, JSON.stringify({ ...data, updatedAt: new Date().toISOString() }));
+  storageSet(DATA_KEY, JSON.stringify({ ...data, updatedAt: new Date().toISOString() }));
 }
 
 export function clearUserData(): void {
-  localStorage.removeItem(DATA_KEY);
+  storageRemove(DATA_KEY);
 }
 
 export function downloadJson(data: UserData): void {
@@ -145,23 +170,24 @@ export async function readJsonFile(file: File): Promise<UserData> {
 
 export function loadGitHubConfig(): GitHubSyncConfig {
   const fallback: GitHubSyncConfig = { username: 'angels00607', repository: 'series-tracker', branch: 'main', filePath: GITHUB_DATA_FILE, rememberToken: false };
-  const token = localStorage.getItem(GITHUB_TOKEN_KEY) || undefined;
-  const raw = localStorage.getItem(GITHUB_CONFIG_KEY);
+  const token = storageGet(GITHUB_TOKEN_KEY) || undefined;
+  const raw = storageGet(GITHUB_CONFIG_KEY);
   if (!raw) return { ...fallback, token, rememberToken: Boolean(token) };
   try {
     return { ...fallback, ...(JSON.parse(raw) as GitHubSyncConfig), token };
   } catch {
+    storageRemove(GITHUB_CONFIG_KEY);
     return { ...fallback, token, rememberToken: Boolean(token) };
   }
 }
 
 export function saveGitHubConfig(config: GitHubSyncConfig): void {
   const { token, ...safeConfig } = config;
-  localStorage.setItem(GITHUB_CONFIG_KEY, JSON.stringify(safeConfig));
-  if (config.rememberToken && token) localStorage.setItem(GITHUB_TOKEN_KEY, token);
-  else localStorage.removeItem(GITHUB_TOKEN_KEY);
+  storageSet(GITHUB_CONFIG_KEY, JSON.stringify(safeConfig));
+  if (config.rememberToken && token) storageSet(GITHUB_TOKEN_KEY, token);
+  else storageRemove(GITHUB_TOKEN_KEY);
 }
 
 export function forgetGitHubToken(): void {
-  localStorage.removeItem(GITHUB_TOKEN_KEY);
+  storageRemove(GITHUB_TOKEN_KEY);
 }
